@@ -1,0 +1,106 @@
+<html>
+<head>
+
+<script type="text/javascript">
+
+function displayDate(x){
+document.getElementById(x).innerHTML=Date();
+}
+
+function writeText(txt){
+document.getElementById("desc").innerHTML=txt;
+}
+
+</script>
+</head>
+<body>
+
+
+<h1>Image System Validation Model</h1>
+
+<img src="plot1.bmp" alt="p1" width="400" height="240" />
+<img src="plot2.bmp" alt="p2" width="400" height="240" />
+<p id="demo1">This is a paragraph.</p>
+<p id="demo2">This is a paragraph.</p>
+<p id="demo3">This is a paragraph.</p>
+<p id="demo4">This is a paragraph.</p>
+
+<button type="button" onclick="displayDate('demo1').innerHTML=Date()">Display Date</button>
+
+<button type="button" onclick="displayDate('demo2')">Display Date</button>
+
+<button type="button" onclick="displayDate('demo3')">Display Date</button>
+
+<button type="button" onclick="displayDate('demo4')">Display Date</button><br />
+
+
+<form action="form_action.asp"
+    enctype="multipart/form-data" onsubmit="upload(this); return false;"> 
+<table style="width:400px;"> 
+ <tr> 
+    <td style="width:500px;">Surface Mean Reflectance(%)</td> 
+    <td style="width:500px;"> 
+        <input onmouseover="writeText('0 - 100')" type="text" name="SMR" value= "10" style="width:100%" /> 
+    </td> 
+ </tr> 
+ <tr> 
+    <td>Surface Reflectance Standard Deviation(%)</td> 
+    <td><input onmouseover="writeText('0 - 100')" type="text" name="SRSD" style="width:100%" /></td> 
+ </tr> 
+ <tr> 
+    <td>Surface Mean Temperture(C)</td> 
+    <td><input onmouseover="writeText('-20 - 100')" type="text" name="SMT" style="width:100%" /></td> 
+ </tr> 
+ <tr> 
+    <td>Surface Temperture Standard Deviation(C)</td> 
+    <td><input onmouseover="writeText('-20 - 100')" type="text" name="STSD" style="width:100%" /></td> 
+ </tr> 
+
+ <tr> 
+    <td>Atmospheric Model</td> 
+    <td> 
+        <select onmouseover="writeText('Choose a Model')" name="Atmospheric Model" style="width:100%"> 
+            <option value="">Please Choose Model</option> 
+            <option value="SP">Spring</option>
+            <option value="SU">Summer</option>
+            <option value="FA">Fall</option>
+            <option value="WI">Winter</option>
+
+
+
+        </select> 
+    </td> 
+ </tr> 
+
+ <tr> 
+    <td>Solar Zenith Angle(degree)</td> 
+    <td><input onmouseover="writeText('0 - 90')" type="text" name="SZA" style="width:100%" /></td> 
+ </tr> 
+
+ <tr> 
+    <td>Meteorological Range(km)</td> 
+    <td><input onmouseover="writeText('NO IDEA')" type="text" name="MR" style="width:100%" /></td> 
+ </tr> 
+
+ <tr> 
+    <td>Sensor Altitude(km)</td> 
+    <td><input onmouseover="writeText('no idea')" type="text" name="SA" style="width:100%" /></td> 
+ </tr> 
+
+ <tr> 
+    <td colspan="2"> 
+        <input type="submit" value="Submit" style="width:30%;" /> 
+    </td> 
+ </tr> 
+
+</table> 
+</form>
+
+<p>Move mouse over title to see descriptions:</p>
+<p id="desc">Mouse over the sun and the planets and see the different descriptions.</p>
+
+<h2>The final result is {{fresult}}</h2>
+
+</body>
+
+</html> 

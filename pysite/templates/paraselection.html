@@ -1,0 +1,280 @@
+<html> 
+<head> 
+<title> Leave your message here </title> 
+    <script type=text/javascript language=JavaScript>  
+        function addmen()
+        {  
+            var d = document.getElementById('id_wavelength_to_choose');  
+            var s = document.getElementById('id_wavelength_chosen');
+            var record = new Array(0);    
+//            alert(ddd.options.length);  
+            for(var i=0;i<d.options.length;i++)
+            {  
+//                alert(i);  
+                if(d.options[i].selected)
+                {  
+//                  alert(d.options[i].text);  
+                    var obj = new Option(d.options[i].text,d.options[i].value);  
+                    s.options.add(obj);
+                    record.push(i);
+                    document.getElementById('id_hiddentxt').value += d.options[i].value;
+                    document.getElementById('id_hiddentxt').value +='\n'                    
+                } 
+                
+            }
+            record.reverse();
+            for (var i=0;i<record.length;i++)
+            {
+                d.remove(record[i]);
+            }            
+        }  
+        function allmen()
+        {  
+            var d = document.getElementById('id_wavelength_to_choose');  
+            var s = document.getElementById('id_wavelength_chosen'); 
+ //           alert(d.options.length);  
+            for(var i=0;i<d.options.length;i++)
+            {  
+//                    alert(d.options[i].text);  
+                    var obj = new Option(d.options[i].text,d.options[i].value);  
+                    s.options.add(obj);
+                    document.getElementById('id_hiddentxt').value += d.options[i].value;
+                    document.getElementById('id_hiddentxt').value +='\n'
+            }
+            for (var i=d.length-1;i>-1;i--)
+            {
+                d.remove(i);
+            }
+            h = d.options.value;
+        }  
+        function returnmen()
+        {  
+            var d = document.getElementById('id_wavelength_to_choose');  
+            var r = document.getElementById('id_wavelength_chosen'); 
+            var record = new Array(0);
+            for(var i=0;i<r.options.length;i++)
+            {  
+                if(true==r.options[i].selected)
+                {  
+                    //alert(d.options[i].text);  
+                    var obj = new Option(r.options[i].text,r.options[i].value);  
+                    record.push(i);     
+                    d.options.add(obj);  
+                }  
+            }
+            record.reverse();
+            for (var i=0;i<record.length;i++)
+            {
+                r.remove(record[i]);
+            }
+            
+            document.getElementById('id_hiddentxt').value = '';
+            for(var i=0;i<r.options.length;i++)
+            {  
+                document.getElementById('id_hiddentxt').value += r.options[i].value;
+                document.getElementById('id_hiddentxt').value +='\n'
+            }            
+        }  
+        function createlist() 
+        { 
+            var d = document.getElementById('id_pfile_selection');  
+//            alert(ddd.options.length);  
+            for(var i=0;i<1;i++)
+            {  
+//                  alert(d.options[i].text);  
+                    var obj = new Option("ppppp",i);  
+                    d.options.add(obj);            
+                
+            }
+
+    
+        } 
+
+        function validate_required(field,alerttxt)
+        {
+            with (field)
+            {
+                if (length==0)
+                {alert(alerttxt);return false}
+                else {return true}
+            }
+        }
+        
+        function range_validate_required(field,low,high,alerttxt)
+        {
+            with (field)
+            {
+                if (value<low||value>high||isNaN(value))
+                {alert(alerttxt);return false}
+                else {return true}
+            }
+        }
+        
+        function count_validate_required(field1,field2,alerttxt)
+        {
+            var s = field2.value.split(",");
+            if(field1.length != s.length)
+            {alert(alerttxt);return false}
+            else {return true}   
+        }        
+        
+        function percent_validate_required(field,alerttxt)
+        {
+            with (field)
+            {
+                var s = value.split(",");
+                var sum = 0;
+                
+                for(var i = 0;i<s.length;i++)
+                { 
+                    if(isNaN(s[i]))
+                    {
+                        alert("Bkg Percentage should be NUMBER");return false
+                    }
+                    else
+                    {
+                        sum = sum + parseInt(s[i])
+                    }
+                
+                }
+                if(sum!=100)
+                {alert(alerttxt);return false}
+                else {return true}
+            }
+        }
+        function validate_form(thisform)
+        {
+            with (thisform)
+            {
+                
+                if (validate_required(document.getElementById('id_wavelength_chosen'),"At least 1 wavelength has to be chosen!")==false)
+                {document.getElementById("id_wavelength_chosen").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Atmospheric_haze'),0,6,"Atmospheric Haze Wrong!")==false)
+                {document.getElementById("id_Atmospheric_haze").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Solangle'),0,90,"Solar Angle Wrong!")==false)
+                {document.getElementById("id_Solangle").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Atmospheric_model'),1,6,"Atmospheric Model Wrong!")==false)
+                {document.getElementById("id_Atmospheric_model").style.backgroundColor = 'LightBlue ';return false}                
+                if (range_validate_required(document.getElementById('id_Noisefac'),0,100,"Sensor Noise Factor Wrong!")==false)
+                {document.getElementById("id_Noisefac").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Gainfac'),0,100," Sensor Gain Factor Wrong!")==false)
+                {document.getElementById("id_Gainfac").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Relcal'),0,100,"Sensor Calibration Error Wrong!")==false)
+                {document.getElementById("id_Relcal").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Tint'),0,1,"Sensor Integration Time Wrong!")==false)
+                {document.getElementById("id_Tint").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Targscale'),0,100,"Target Scale Wrong!")==false)
+                {document.getElementById("id_Targscale").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Targperc'),0,100,"Target Percentage Wrong!")==false)
+                {document.getElementById("id_Targperc").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Targinback'),0,document.getElementById('id_Bkgname').options.length-1,"Target in Background Number Wrong!")==false)
+                {document.getElementById("id_Targinback").style.backgroundColor = 'LightBlue ';return false}
+                if (range_validate_required(document.getElementById('id_Bkgscale'),0,100,"Background Scale Wrong!")==false)
+                {document.getElementById("id_Bkgscale").style.backgroundColor = 'LightBlue ';return false}
+                if (percent_validate_required(document.getElementById('id_Backperc'),"Background Percentage should sum to 100, format like 50,40,10")==false)
+                {document.getElementById("id_Backperc").style.backgroundColor = 'LightBlue ';return false}
+                if (count_validate_required(document.getElementById('id_Bkgname'),document.getElementById('id_Backperc'),"Bkg file name count and Bkg % should be consistent")==false)
+                {document.getElementById("id_Backperc").style.backgroundColor = 'LightBlue ';return false}                
+            }
+        }
+
+        function formsubmit()
+        {
+            form = document.getElementById('id_wavelength_chosen');
+            document.forms[0].submit()
+        }        
+        function writeText(txt)
+        {
+            document.getElementById("description").innerHTML=txt;
+        }        
+        
+    </script>  
+    <style>
+        select[multiple="multiple"]{width:160px;height:200px}
+        select[name="Bkgname"]{width:160px;height:74px}
+        
+        span{font-size: 9pt}
+        label{font-size: 9pt; font-weight:normal}
+        
+        input[type="text"]{width:160px;height:20px}
+        select[name="Targinback"]{width:160px;height:20px}
+
+    </style>    
+    
+</head>
+
+<body> 
+<h1>Hyperspectral Imaging System Prediction Model</h1>
+
+
+
+<h2>Leave your parameters</h2> 
+<form action="/mysite/paraselection/" onsubmit="return validate_form(this)" method="POST"> 
+<font color="red"><strong> 
+<p id="description">PARAMETER HINT, WHEN MODIFYING</p> 
+</strong></font>
+<table style="width:220px;">
+    <tr>
+    
+    <td style="vertical-align:top;">
+    <h4>Scene</h4>    
+    <table>
+        <td>{{FormScene.as_p}}</td>
+    </table>
+    </td>
+        
+    <td style="vertical-align:top;">
+    <h4>Sensor</h4>
+    <table>
+        <td>{{FormSensor.as_p}}</td>
+    </table>
+    </td>
+    
+    
+    <td style="vertical-align:top;">
+    <h4>Target</h4>
+    <table>
+        <td>{{FormTarget.as_p}}</td>
+    </table>
+    </td>
+    
+    <td style="vertical-align:top;">
+    <h4>Background</h4>
+    <table>
+        <td>{{FormBackground.as_p}}</td>
+    </table>
+    </td>    
+    
+    </tr>
+</table>   
+  
+{{ form.as_table }} 
+  
+<br><br><br> 
+<table style="width:400px;">
+    <tr>
+    <td>
+    <table>
+        <td>{{ formtochoose.as_p }}</td>
+    </table>
+    </td>
+        
+    <td>
+    <table>
+        <td>{{ formchosen.as_p }}</td>
+    </table>
+    </td>
+    </tr>
+    
+</table> 
+
+<input type="hidden" id="id_hiddentxt" value="">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <input name="d" type="button" id="d" value="&lt;&lt;" onClick="returnmen();">  
+     <input name="d" type="button" id="d" value="&gt;&gt;" onClick="addmen();">  
+     <input name="d" type="button" id="d" value="add all" onClick="allmen();">       
+<p><input type="submit" value="Submit"></p> 
+</form>
+
+</body> 
+</html>

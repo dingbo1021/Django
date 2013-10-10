@@ -1,0 +1,63 @@
+<html>
+<head>
+
+</head>
+<body>
+
+<h3>The result1 is {{fresult1}}, {{fresult2}}, {{fresult3}}, {{fresult4}}, {{fresult5}},{{fresult6}}</h3>
+
+<h3>The result2 is {{result1}}, {{result2}}, {{result3}}, {{result4}}, {{result5}},{{result6}}</h3>
+<h3>check back url = http://localhost/mysite/result/{{session_key}}</h3>
+<h3>Scene Mean Spectral Radiance</h3>
+<form action="/mysite/result/" method="POST"> 
+<table>
+	<tr>
+	
+	<td>
+	<table>
+		<td><img src="/site_media/{{session_key}}/rad.png"/></td>
+	</table>
+	</td>
+		
+	<td>
+	<table>
+		<td>{{FormRadianceChoice.as_p}}<p></td>
+	</table>
+	</td>
+    
+    </tr>
+</table>
+<a href="/site_media/{{session_key}}/LBT.txt">Right Click to Download Radiance File</a> 
+
+<p></p>
+<h3>Scene Signal-to-Noise Ratio</h3>
+
+<table>
+	<tr>
+	
+	<td>
+	<table>
+		<td><img src="/site_media/{{session_key}}/snr.png"/></td>
+	</table>
+	</td>
+		
+	<td>
+	<table>
+		<td>{{FormSNRChoice.as_p}}<p></p><input type="submit" value="Submit"> </td>
+	</table>
+	</td>
+    
+    </tr>
+</table>
+</form>
+
+
+<a href="/site_media/{{session_key}}/SNR.txt">Right Click to Download SNR File</a> 
+<p></p>
+<h3>ROC Curve</h3>
+<img src="/site_media/{{session_key}}/roc.png"/>
+<p></p>
+<a href="/site_media/{{session_key}}/ROC.txt">Right Click to Download ROC File</a> 
+<p></p>
+</body>
+</html> 
