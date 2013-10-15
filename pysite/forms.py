@@ -22,6 +22,7 @@ TARGET_CHOICES = (
     ('avongrass.ref','Avon Grass'),
 )
 
+# selections are wrong, to be filled.
 BKG_CHOICES = (
     ('950824_05_Tree1_R.ref','TREE'),
     ('950824_05_Grass1_R.ref','Old GRASS'),
@@ -58,7 +59,7 @@ wlgthselected = (
 #temp.append(('another','AT'))
 #TOPIC_CHOICES = tuple(temp)
 
-def readfile(filename):
+def readWVfile(filename):
     str1 = 'C:\Django\pysite\sensorWV\\'
     str2 = filename;
     str3 = '.txt'
@@ -77,18 +78,8 @@ def getkeywordvalue(keyword):
         a.strip()
         b = a.split('::')
     return b[1] if a!='' else 'NULL'
-
-def get_choices(keyword):
-    string = getkeywordvalue(keyword)
-    choices_list = string.strip().split(',')
-	
-    out = []
-    for x in range(len(choices_list)):
-        if choices_list[x]!='':
-            out.append([x,choices_list[x]]) 
-    return tuple(out)
     
-def get_choices2(keyword):
+def get_choices(keyword):
     string = keyword
     choices_list = string.strip().split(',')
 	
@@ -104,40 +95,28 @@ def get_choiceswithAVGandTarget(keyword):
     string = getkeywordvalue(keyword)
             
     choices_list = string.strip().split(',')
- #   raise Exception(choices_list)   
     out = []
     for x in range(len(choices_list)):
         if choices_list[x]!='':
             out.append([x,choices_list[x]]) 
     out.append([x+1,stringA])        
     out.append([x+2,stringT])
-#    raise Exception(out)     
     return tuple(out)
-    
-def get_tochoose_choices():
-    choices_list = readfile('wavelength')
-    out = []
-    for x in range(len(choices_list)):
-        out.append([x,choices_list[x]]) 
-    return tuple(out)
-    
-def get_tochoose_choices2(filename):
-    choices_list = readfile(filename)
+
+def get_tochoose_choices(filename):
+    choices_list = readWVfile(filename)
     out = []
     for x in range(len(choices_list)):
         out.append([x,choices_list[x]]) 
     return tuple(out)
     
 
-    
-class MessageForm2(forms.Form): 
+class PfileSelectionForm(forms.Form): 
     pfile_selection = forms.ChoiceField(choices=TOPIC_CHOICES)	
 	
-class MessageForm(forms.Form): 
+class FormWVchosen(forms.Form): 
     hiddentxt = forms.CharField(widget=forms.HiddenInput, required=False)
 
-class FormBkgName(forms.Form): 
-    hiddentxt = forms.CharField(widget=forms.HiddenInput, required=False)
 class FormSensorName(forms.Form): 
     def __init__(self, *args, **kw):
         SensorName = kw.pop("SensorName")
@@ -155,19 +134,7 @@ class FormScene(forms.Form):
         MeteorologicalRange = kw.pop("MeteorologicalRange")         
     
         super(forms.Form, self).__init__(*args, **kw)	
-        # self.fields["Atmospheric_haze"] = forms.IntegerField(label='Atmospheric Haze',initial = getkeywordvalue('Atmospheric Haze'),required=True,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("0=No Aerosols, 1=Rural-clr, 2=Rural-Hazy, 3=Navy Maritime,  4=Maritime, 5=Urban, 6=Trop")'}))		
-        # self.fields["Ground_altitude"] = forms.FloatField(label='Ground Altitude',initial = getkeywordvalue('Ground Altitude'),required=True,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Ground Altitude(km)")'}))		
-        # self.fields["Solangle"] = forms.FloatField(label='Solar Angle',initial = getkeywordvalue('Solar Angle'), required=True,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Solar Angle,0~90")'})) 
-        # self.fields["Atmospheric_model"] = forms.FloatField(label='Atmospheric Model',initial = getkeywordvalue('Atmospheric Model'), required=True, 
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("1=Tropical, 2=MidLat Summ, 3=MidLat Wint, 4=SubArc Summ, 5=SubArc Win, 6=US Standard")'}))
-        # self.fields["icld"] = forms.FloatField(label='Cloud Index',initial = getkeywordvalue('Cloud Index'), required=True, 
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("0=No Cloud, 1 = Cloud")'}))       
-        # self.fields["Mrange"] = forms.FloatField(label='Meteorological Range',initial = getkeywordvalue('Meteorological Range'), required=True, 
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("the range describe visibility, unit km")'}))      
-        
+    
         self.fields["Atmospheric_haze"] = forms.IntegerField(label='Atmospheric Haze',initial = AtmosphericHaze,required=True,
 		widget=forms.TextInput(attrs={'onfocus':'writeText("0=No Aerosols, 1=Rural-clr, 2=Rural-Hazy, 3=Navy Maritime,  4=Maritime, 5=Urban, 6=Trop")'}))		
         self.fields["Ground_altitude"] = forms.FloatField(label='Ground Altitude',initial = GroundAltitude,required=True,
@@ -205,18 +172,7 @@ class FormSensor(forms.Form):
 		widget=forms.TextInput(attrs={'onfocus':'writeText("Sensor Integration Time")'}))
         self.fields["Platalt"] = forms.FloatField(label='Sensor Altitude(km)',initial = SensorAltitude,required=False,
 		widget=forms.TextInput(attrs={'onfocus':'writeText("Sensor Altitude(km)")'}))            
-    
-        # super(forms.Form, self).__init__(*args, **kw)	
-        # self.fields["Noisefac"] = forms.FloatField(label='Noise Factor',initial = getkeywordvalue('Noise Factor'),required=False,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Noise Factor(default 1)")'})) 
-        # self.fields["Gainfac"] = forms.FloatField(label='Gain Factor',initial = getkeywordvalue('Gain Factor'),required=False,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Gain Factor(default 1)")'})) 
-        # self.fields["Relcal"] = forms.FloatField(label='Rltv Calibration Error(%)',initial = getkeywordvalue('Rltv Calibration Error'),required=False,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Relative Calibration Error (percent)")'})) 
-        # self.fields["Tint"] = forms.FloatField(label='Integration Time(s)',initial = getkeywordvalue('Integration Time'),required=False,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Sensor Integration Time")'}))
-        # self.fields["Platalt"] = forms.FloatField(label='Sensor Altitude(km)',initial = getkeywordvalue('Sensor Altitude'),required=False,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Sensor Altitude(km)")'}))        
+  
 class FormTarget(forms.Form): 
     def __init__(self, *args, **kw):
     
@@ -226,23 +182,14 @@ class FormTarget(forms.Form):
         BkgName = kw.pop("BkgName")
         
         super(forms.Form, self).__init__(*args, **kw)	
-        
-        # self.fields["Targname"] = forms.CharField(label='Target file Name',initial = getkeywordvalue('Target Name'),required=False,
-        # widget=forms.TextInput(attrs={'onmouseover':'writeText("Target File Name (readonly)")','readonly':'readonly'}))
-        # self.fields["Targscale"] = forms.FloatField(label='Target Scale',initial = getkeywordvalue('Target Scale'),required=False,
-        # widget=forms.TextInput(attrs={'onfocus':'writeText("Target Covariance Scale Factor (default 1)")'})) 
-        # self.fields["Targperc"] = forms.FloatField(label='Target Percentage(%)',initial = getkeywordvalue('Target Percentage'),required=False,
-        # widget=forms.TextInput(attrs={'onfocus':'writeText("Target Percentage IFOV")'})) 
-        # self.fields["Targinback"] = forms.ChoiceField(label='Target In which bkg',choices=get_choices('Bkg Name'), initial=int(getkeywordvalue('In Bkg No'))-1, required=False,
-        # widget=forms.Select(attrs={'onfocus':'writeText("Background Class Number Target Embedded in")'}))  
-       
+   
         self.fields["Targname"] = forms.CharField(label='Target file Name',initial = TargetName, required=False,
 		widget=forms.TextInput(attrs={'onmouseover':'writeText("Target File Name (readonly)")','readonly':'readonly'}))      
         self.fields["Targscale"] = forms.FloatField(label='Target Scale',initial = TargetScale,required=False,
 		widget=forms.TextInput(attrs={'onfocus':'writeText("Target Covariance Scale Factor (default 1)")'})) 
         self.fields["Targperc"] = forms.FloatField(label='Target Percentage(%)',initial = TargetPercentage,required=False,
 		widget=forms.TextInput(attrs={'onfocus':'writeText("Target Percentage IFOV")'})) 
-        self.fields["Targinback"] = forms.ChoiceField(label='Target In which bkg',choices=get_choices2(BkgName), initial=int(getkeywordvalue('In Bkg No'))-1, required=False,
+        self.fields["Targinback"] = forms.ChoiceField(label='Target In which bkg',choices=get_choices(BkgName), initial=int(getkeywordvalue('In Bkg No'))-1, required=False,
 		widget=forms.Select(attrs={'onfocus':'writeText("Background Class Number Target Embedded in")'})) 
 
 class FormBackground(forms.Form): 
@@ -254,35 +201,25 @@ class FormBackground(forms.Form):
         BkgPercentage = kw.pop("BkgPercentage")
         
         super(forms.Form, self).__init__(*args, **kw)
-        # self.fields["Bkgname"] = forms.MultipleChoiceField(label='Bkg file Name',choices=get_choices('Bkg Name'),required=False,
-		# widget=forms.SelectMultiple(attrs={'onfocus':'writeText("Background Reflectance Filename")'}))
-        # self.fields["Bkgscale"] = forms.FloatField(label='Bkg Scale',initial = getkeywordvalue('Bkg Scale'),required=False,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Background Covariance Scale Factor (default 1)")'})) 
-        # self.fields["Backperc"] = forms.CharField(label='Bkg Percentage(%)',initial = getkeywordvalue('Bkg Percentage'), required=False,
-		# widget=forms.TextInput(attrs={'onfocus':'writeText("Background Class Percent of Scene")'}))		        
-#        self.fields["Numback"] = forms.IntegerField(label='Bkg Class Count',initial = getkeywordvalue('Bkg Class Count'),required=False)
 
-        self.fields["Bkgname"] = forms.MultipleChoiceField(label='Bkg file Name',choices = get_choices2(BkgName),required=False,
+        self.fields["Bkgname"] = forms.MultipleChoiceField(label='Bkg file Name',choices = get_choices(BkgName),required=False,
 		widget=forms.SelectMultiple(attrs={'onfocus':'writeText("Background Reflectance Filename")'}))
         self.fields["Bkgscale"] = forms.FloatField(label='Bkg Scale',initial = BkgScale,required=False,
 		widget=forms.TextInput(attrs={'onfocus':'writeText("Background Covariance Scale Factor (default 1)")'})) 
         self.fields["Backperc"] = forms.CharField(label='Bkg Percentage(%)',initial = BkgPercentage, required=False,
 		widget=forms.TextInput(attrs={'onfocus':'writeText("Background Class Percent of Scene")'}))		
-        
         self.fields["Bkgname2"] = forms.CharField(label='Bkg Percentage(%)',initial = BkgName, required=False,
         widget=forms.HiddenInput)	      
         
 class FormWavelength_chosen(forms.Form): 
     wavelength_chosen = forms.MultipleChoiceField(label='Wavelength Chosen',required=False)	
+    
 class FormWavelength_to_choose(forms.Form): 
     def __init__(self, *args, **kw):
-    #first remove my custom keyword from the list of keyword args
         SensorName = kw.pop("SensorName")
         super(forms.Form, self).__init__(*args, **kw)
-        #now we dynamically add the customer choices - accepts partners as an input
-        self.fields["wavelength_to_choose"] = forms.MultipleChoiceField(label='Wavelength To Choose',choices=get_tochoose_choices2(SensorName))
-#        self.fields['MultipleChoiceField'].choices = get_tochoose_choices()
-#    wavelength_to_choose = forms.MultipleChoiceField(label='Wlgth to choose',choices=get_tochoose_choices())
+        self.fields["wavelength_to_choose"] = forms.MultipleChoiceField(label='Wavelength To Choose',choices=get_tochoose_choices(SensorName))
+
 class FormRadianceChoice(forms.Form): 
     def __init__(self, *args, **kw):
         super(forms.Form, self).__init__(*args, **kw)
@@ -297,10 +234,13 @@ class FormCustomize(forms.Form):
     sensor_selection = forms.ChoiceField(choices=SENSOR_CHOICES)
     target_selection = forms.ChoiceField(choices=TARGET_CHOICES)
     hiddentxt = forms.CharField(widget=forms.HiddenInput, required=False)
+    
 class FormBKG_tochoose(forms.Form): 
     BKG_tochoose = forms.MultipleChoiceField(label='Background to Choose',required=False, choices = BKG_CHOICES)
+    
 class FormBKG_chosen(forms.Form): 
-    BKG_chosen = forms.MultipleChoiceField(label='Background Chosen',required=False)	
+    BKG_chosen = forms.MultipleChoiceField(label='Background Chosen',required=False)
+    
 class FormFinalSubmition(forms.Form): 
     Atmospheric_haze = forms.IntegerField(required=True)
     Solangle = forms.FloatField(required=True)

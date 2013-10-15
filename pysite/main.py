@@ -5,22 +5,26 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse 
 from django.conf import settings
 
-from forms import FormSensor
-from forms import FormTarget
-from forms import FormBackground
-from forms import MessageForm
-from forms import MessageForm2
-from forms import FormWavelength_chosen
-from forms import FormWavelength_to_choose
-from forms import FormScene
+from forms import PfileSelectionForm
+
 from forms import FormCustomize
 from forms import FormBKG_chosen
 from forms import FormBKG_tochoose
+
+from forms import FormWVchosen
+
+from forms import FormSensor
+from forms import FormTarget
+from forms import FormBackground
+from forms import FormScene
+from forms import FormWavelength_chosen
+from forms import FormWavelength_to_choose
+from forms import FormSensorName
+
 from forms import FormRadianceChoice
 from forms import FormSNRChoice
-from forms import FormFinalSubmition
-from forms import FormBkgName
-from forms import FormSensorName
+
+#from forms import FormFinalSubmition
 
 from ctypes import *
 import Image
@@ -34,32 +38,17 @@ import os
 import re
 import random
 
-                
 def startpage(request):
     if request.method == 'POST': # click submit on page startpage
-        form = MessageForm2(request.POST) 
-        if form.is_valid(): 
-            pfiles = form.cleaned_data['pfile_selection'] 
-#            f = open("C:\Django\pysite\pfilename.txt", "w")
-#            f.write(pfiles)
-#            f.close()            
+        pfileform = PfileSelectionForm(request.POST) 
+        if pfileform.is_valid(): 
+            pfiles = pfileform.cleaned_data['pfile_selection']        
             if pfiles != 'Customized.fcm': # if select predefined page
-#############
-#############parse corresponding fcm, read corresponding sensor WV file
-############
-#                data = open('C:/FASSP_EMMETT/v2.4/pfiles/'+pfiles).read()
-#                open('C:/FASSP_EMMETT/v2.4/pfiles/customized.fcm', 'wb').write(data)
-#                Sensorchosen = findsensorname('customized.fcm','C:/FASSP_EMMETT/v2.4/pfiles/')
-                
-############ write wavelength file
-#                parsesensor(Sensorchosen,'C:/FASSP_EMMETT/v2.4/sens/')
-                
-#                parseFCM_genPrefill('customized.fcm','C:/FASSP_EMMETT/v2.4/pfiles/') 
-                #os.system("C:/Django/pysite/pre.exe")
-#                dict = parseFCM_genPrefill('customized.fcm','C:/FASSP_EMMETT/v2.4/pfiles/')
+            
+#############parse corresponding fcm
                 dict = parseFCM_genPrefill(pfiles,'C:/FASSP_EMMETT/v2.4/pfiles/')                
                 
-                form = MessageForm()
+                formwvchosen = FormWVchosen()
 ###############read corresponding WV file, according to sensor name
                 formtochoose = FormWavelength_to_choose(SensorName = dict['Sensor Name'])
                 formchosen = FormWavelength_chosen()
@@ -91,26 +80,18 @@ def startpage(request):
                 BkgName2 = dict['Bkg Name'],
                 BkgScale = dict['Bkg Scale'],
                 BkgPercentage = dict['Bkg Percentage'])
-               
                 
-#                data = open('C:/FASSP_EMMETT/v2.4/pfiles/'+pfiles).read()
-#                f = open('C:/FASSP_EMMETT/v2.4/pfiles/customized.fcm', 'wb')
- #               f.write(data) 
- #               f.close()
-            
                 return render_to_response('paraselection.html',
-                {'form': form,'formtochoose': formtochoose,'formchosen': formchosen,'FormTarget': formtarget
+                {'formwvchosen': formwvchosen,'formtochoose': formtochoose,'formchosen': formchosen,'FormTarget': formtarget
                           ,'FormScene': formscene,'FormBackground': formbackground,'FormSensor': formsensor})
             else: # if select customized page
                 return render_to_response('customize.html',
-                {'FormCustomize': FormCustomize, 'FormBKG_chosen': FormBKG_chosen,'FormBKG_tochoose': FormBKG_tochoose})
- #           {'form': form})                    
- #raise Exception(formto\choose)                          
+                {'FormCustomize': FormCustomize, 'FormBKG_chosen': FormBKG_chosen,'FormBKG_tochoose': FormBKG_tochoose})         
+                    
     else: 
-        form = MessageForm2()
+        pfileform = PfileSelectionForm()
 
-    return render_to_response('startpage.html',{'form': form})
-    
+    return render_to_response('startpage.html',{'form': pfileform})
     
 def customize(request):
 #    raise Exception(request)   
@@ -125,28 +106,15 @@ def customize(request):
             Sensorchosen = formcustomize.cleaned_data['sensor_selection']
             Targetchosen = formcustomize.cleaned_data['target_selection']
             
-            #write customized.fcm from template.fcm using data
-#            data = open('C:/FASSP_EMMETT/v2.4/pfiles/template.fcm').read()
-#            data = re.sub('backnamehere',BKGchosen, data) 
-#            data = re.sub('sensornamehere',Sensorchosen, data) 
-#            data = re.sub('targetnamehere',Targetchosen, data) 
-#            data = re.sub('backperchere',BKGperc, data) 
-#            data = re.sub('backnumhere',str(BKGcount), data)         
-#            open('C:/FASSP_EMMETT/v2.4/pfiles/customized.fcm', 'wb').write(data)
-#raise Exception(BKGperc)         
-#############read corresponding wavelength.txt according to sensor name
-#            parsesensor(Sensorchosen,'C:/FASSP_EMMETT/v2.4/sens/')
-
             #parse template fcm file
             dict = parseFCM_genPrefill('customized_base.fcm','C:/FASSP_EMMETT/v2.4/pfiles/') 
+            #change corresponding parts customized by user
             dict['Target Name'] = Targetchosen
             dict['Sensor Name'] = Sensorchosen
             dict['Bkg Name'] = BKGchosen
-            dict['Bkg Percentage'] = BKGperc
-#            os.system("C:/Django/pysite/pre.exe") 
-#            raise Exception(BKGchosen)               
+            dict['Bkg Percentage'] = BKGperc       
             
-            form = MessageForm()
+            formwvchosen = FormWVchosen()
 #############read corresponding wavelength.txt according to sensor name
             formtochoose = FormWavelength_to_choose(SensorName = dict['Sensor Name'])
             formchosen = FormWavelength_chosen()
@@ -179,35 +147,31 @@ def customize(request):
             BkgScale = dict['Bkg Scale'],
             BkgPercentage = dict['Bkg Percentage'])
             
-
 #            raise Exception(Sensorchosen) 
             return render_to_response('paraselection.html',
-            {'form': form,'formtochoose': formtochoose,'formchosen': formchosen,'FormTarget': formtarget
+            {'formwvchosen': formwvchosen,'formtochoose': formtochoose,'formchosen': formchosen,'FormTarget': formtarget
                       ,'FormScene': formscene,'FormBackground': formbackground,'FormSensor': formsensor})               
  #raise Exception(formtochoose)                          
     else:
         return render_to_response('jump.html')    
     
-    
 def paraselection(request):
 
     if request.method == 'POST': # click submit on page paraseletion:
 #        raise Exception(request.POST)
-        form = MessageForm(request.POST) # this form is to store the chosen wavelength, and sessionID
-        formfinal = FormFinalSubmition(request.POST)     
+        form = FormWVchosen(request.POST) # this form is to store the chosen wavelength, and sessionID
+#        formfinal = FormFinalSubmition(request.POST)     
         
-        # if (form.is_valid() and formscene.is_valid() and formsensor.is_valid() 
-        # and formtarget.is_valid() and formbackground.is_valid()) :
         if(form.is_valid()):
-            #since I don't know how to pass a multi choice form's all options(the form wavelength chosen)
-            #so I just use a hidden txt block to transfer them.
-            hiddentxt  = form.cleaned_data['hiddentxt']
-#            raise Exception(hiddentxt)                
+            #use a hidden txt block to transfer WV chosen.
+            hiddentxt  = form.cleaned_data['hiddentxt']             
             #store all chosen wavelength
+            #write it to wchosen.txt, but could be combined with fcm file.
             f = open("C:/Django/pysite/wchosen.txt", "w")
             for x in range(0,len(hiddentxt)):
                 f.write("%s" % (hiddentxt[x]))
             f.close()
+            
 
             Atmospheric_haze = request.POST['Atmospheric_haze']
             Solangle = request.POST['Solangle'] 
@@ -235,8 +199,8 @@ def paraselection(request):
             
             while not Backperc[-1].isdigit():
                 Backperc = Backperc[:-1]
-#            raise Exception(Backperc)             
- #############################random number 
+           
+ ###########generate random number for diff users
             session_key = str(random.random())[2:]
             request.session['session_key'] = session_key
             path = 'C:/Django/pysite/media/'+session_key+'/'
@@ -270,40 +234,32 @@ def paraselection(request):
             FCMdata = modifyCustomFCM('backperc', Backperc, FCMdata,1)
             FCMdata = modifyCustomFCM('numback', str(len(Backperc.split(','))), FCMdata)
             
-##########writing chosen wvlg to FCM file            
+##########writing chosen wvlg to FCM file for C++ code
             FCMdata = modifyCustomFCM('wavelengthchosen', ','.join(str(hiddentxt).split('\r\n'))[:-1], FCMdata)
             open('C:/FASSP_EMMETT/v2.4/pfiles/customized.fcm', 'wb').write(FCMdata)
-            
 
-          
-            
 ############################################################################################################
             feedback = os.system("C:/Django/pysite/working.exe")
-            #give fcm file to queue, then check sessionid folder. 
+            #to be finished: give fcm file to queue, then check sessionid folder. 
 ############################################################################################################   
 #            feedback =0;   
             if feedback == -1:
                 return render_to_response('errorpage.html')           
             
-
-#            Wlnumbers = readfile('wavelength')
-            
-            Wlnumbers = readfilep(str(SensorName),'C:/FASSP_EMMETT/v2.4/sensorWV/')
-            wchosenlength = len(Wlnumbers)
+            Wvlength = readfilep(str(SensorName),'C:/FASSP_EMMETT/v2.4/sensorWV/')
+            WvlengthCount = len(Wvlength)
             #read txt file generated by working.exe
-            Ltnumbers = readfile('LBT')
-            SNRn = readfile('SNR')
-            ROC = readfile('ROC')
+            Ltnumbers = readfilep('LBT')
+            SNRn = readfilep('SNR')
+            ROC = readfilep('ROC')
 
-            showback = len(Ltnumbers)/wchosenlength-1
-
-
+            showback = len(Ltnumbers)/WvlengthCount-1
                 
             TgtName = []
             TgtName.append(str(TargName))
             
-            LTdisplay = Ltnumbers[(showback*wchosenlength):(showback*wchosenlength+wchosenlength)]    
-            plt1.plot(Wlnumbers,LTdisplay)
+            LTdisplay = Ltnumbers[(showback*WvlengthCount):(showback*WvlengthCount+WvlengthCount)]    
+            plt1.plot(Wvlength,LTdisplay)
             plt1.xlim([400, 2500]) 
             plt1.title('Scene Mean Spectral Radiance')
             plt1.legend(TgtName,prop={'size':8})
@@ -311,13 +267,9 @@ def paraselection(request):
             plt1.ylabel('Spectral Radiance(mW/cm^2-sr-um)')
             plt1.savefig("C:/Django/pysite/media/"+session_key+"/rad.png",dpi=100)
             plt1.clf()
-#            im = Image.open("C:/Django/pysite/media/rad.png")
-#            out = im.resize((800,600))
-#            out.save('C:/Django/pysite/media/rad.png')
-            
 
-            SNRdisplay = SNRn[showback*wchosenlength:(showback*wchosenlength+wchosenlength)]
-            plt2.plot(Wlnumbers,SNRdisplay)
+            SNRdisplay = SNRn[showback*WvlengthCount:(showback*WvlengthCount+WvlengthCount)]
+            plt2.plot(Wvlength,SNRdisplay)
             plt2.xlim([400, 2500]) 
             plt2.ylim([0, 110]) 
             plt2.title('Sensor Signal-to-Noise Ratio')
@@ -326,9 +278,6 @@ def paraselection(request):
             plt2.ylabel('Signal-to-Noise Ratio')
             plt2.savefig("C:/Django/pysite/media/"+session_key+"/snr.png",dpi=100)
             plt2.clf()
-#            im = Image.open("C:/Django/pysite/media/snr.png")
-#            out = im.resize((800,600))
- #           out.save('C:/Django/pysite/media/snr.png')
 
             Pdmin = ROC[0:7]
             Pfa = ROC[7:14]
@@ -341,8 +290,7 @@ def paraselection(request):
             plt3.ylabel('Probability of Detection')
             plt3.savefig("C:/Django/pysite/media/"+session_key+"/roc.png",dpi=100)
             plt3.clf()            
-#            im = Image.open("C:/Django/pysite/media/output3.png")
-            
+
             dataL = open('C:/Django/pysite/LBT.txt').readlines()
             dataSNR = open('C:/Django/pysite/SNR.txt').readlines()
             dataROC = open('C:/Django/pysite/ROC.txt').readlines()
@@ -351,34 +299,31 @@ def paraselection(request):
             DataTitleSNR = [];
             
             datasize = len(dataL);
-            for x in range(0,datasize/wchosenlength-2):
+            for x in range(0,datasize/WvlengthCount-2):
                 DataTitleL.append('L of Background ' + str(x+1) + '\n');
                 DataTitleSNR.append('SNR of Background ' + str(x+1) + '\n');
             DataTitleL.append('L of Background Average\n');
             DataTitleL.append('L of Target\n');
             DataTitleSNR.append('SNR of Background Average\n');
             DataTitleSNR.append('SNR of Target\n');
-#            session_key = request.COOKIES['csrftoken']         
 
  #           raise Exception(str(session_key)[2:])
-            for x in range(0,datasize/wchosenlength):
-                dataL.insert(datasize-wchosenlength*(x+1),DataTitleL[datasize/wchosenlength-1-x])
-                dataSNR.insert(datasize-wchosenlength*(x+1),DataTitleSNR[datasize/wchosenlength-1-x])
-
-            open(path+'LBT.txt', 'wb').write(''.join(dataL))
-            open(path+'SNR.txt', 'wb').write(''.join(dataSNR))
+            for x in range(0,datasize/WvlengthCount):
+                dataL.insert(datasize-WvlengthCount*(x+1),DataTitleL[datasize/WvlengthCount-1-x])
+                dataSNR.insert(datasize-WvlengthCount*(x+1),DataTitleSNR[datasize/WvlengthCount-1-x])
             
+            #write LBT, SNR, ROC file to corresponding folder
             dataROC.insert(0,'P detection\n')
             dataROC.insert(8,'P false alarm\n')
             open(path+'ROC.txt', 'wb').write(''.join(dataROC))
-            
+            open(path+'LBT.txt', 'wb').write(''.join(dataL))
+            open(path+'SNR.txt', 'wb').write(''.join(dataSNR))
+
             formsensorname = FormSensorName(SensorName = SensorName)
-#            a = request.session['session_key']
-#            raise Exception(request) 
+
             return render_to_response('result.html',{'FormRadianceChoice':FormRadianceChoice(),'FormSNRChoice':FormSNRChoice(),
                 'fresult3':Pdmin[2],'fresult4':Pdmin[3],'fresult5':Pdmin[4],'fresult6':Pdmin[5],'result1':Pfa[0],'result2':Pfa[1],
                 'result3':Pfa[2],'result4':Pfa[3],'result5':Pfa[4],'result6':Pfa[5],'session_key':session_key,'SensorName':str(SensorName),'FormSensorName':formsensorname})            
- #          return HttpResponseRedirect(reverse('/mysite/helloworld/results/',kwargs = {'fresult':fresult})) 
         else:
             return render_to_response('errorpage.html')  
     else:
@@ -395,63 +340,54 @@ def results(request):
         if formradiancechoice.is_valid() and formSNRchoice.is_valid():
             Radchosen = formradiancechoice.cleaned_data['BkgnameR'] 
             SNRchosen = formSNRchoice.cleaned_data['BkgnameS'] 
-            Wlnumbers = readfilep(str(SensorName),'C:/FASSP_EMMETT/v2.4/sensorWV/')
+            Wvlength = readfilep(str(SensorName),'C:/FASSP_EMMETT/v2.4/sensorWV/')
             
-            wchosenlength = len(Wlnumbers)
+            WvlengthCount = len(Wvlength)
             path = 'C:/Django/pysite/media/'+session_key+'/'
-            Ltnumbers = readfilep2('LBT',path)
-            SNRn = readfilep2('SNR',path)
-            ROC = readfile('ROC')
+            Ltnumbers = readfilepstr('LBT',path)
+            SNRn = readfilepstr('SNR',path)
+            ROC = readfilep('ROC')
             
             choicesR = formradiancechoice.fields['BkgnameR'].choices        
-            LegendR=[]
+            LegendRadiance=[]
             if len(Radchosen)!=0:
                 for i in range(0, len(Radchosen)):
-                    LegendR.append(choicesR[int(Radchosen[i])][1])
-                    LTdisplay = Ltnumbers[(int(Radchosen[i])*(wchosenlength+1)+1):(int(Radchosen[i])*(wchosenlength+1)+1+wchosenlength)]    
-                    plt1.plot(Wlnumbers,map(float,LTdisplay))
-    #            raise Exception(LegendR)    
+                    LegendRadiance.append(choicesR[int(Radchosen[i])][1])
+                    LTdisplay = Ltnumbers[(int(Radchosen[i])*(WvlengthCount+1)+1):(int(Radchosen[i])*(WvlengthCount+1)+1+WvlengthCount)]    
+                    plt1.plot(Wvlength,map(float,LTdisplay))
+    #            raise Exception(LegendRadiance)    
                 plt1.xlim([400, 2500]) 
                 plt1.title('Scene Mean Spectral Radiance')
                 plt1.xlabel('Wavelength(microns)')
                 plt1.ylabel('Spectral Radiance(mW/cm^2-sr-um)')
-                plt1.legend(LegendR,prop={'size':8})
+                plt1.legend(LegendRadiance,prop={'size':8})
                 plt1.savefig("C:/Django/pysite/media/"+session_key+"/rad.png",dpi=100)
                 plt1.clf()
-       
-#            im = Image.open("C:/Django/pysite/media/"+session_key+"/rad.png")
-#            out = im.resize((800,600))
-#            out.save('C:/Django/pysite/media/'+session_key+'/rad.png')
-                 
+                    
             choicesS = formSNRchoice.fields['BkgnameS'].choices
-            
-            LegendS=[]
-            
+            LegendSNR=[]  
             if len(SNRchosen)!=0:
                 for i in range(0, len(SNRchosen)):
-                    LegendS.append(choicesR[int(SNRchosen[i])][1])
-                    SNRdisplay = SNRn[(int(SNRchosen[i])*(wchosenlength+1)+1):(int(SNRchosen[i])*(wchosenlength+1)+1+wchosenlength)]
-                    plt2.plot(Wlnumbers,map(float,SNRdisplay))
+                    LegendSNR.append(choicesR[int(SNRchosen[i])][1])
+                    SNRdisplay = SNRn[(int(SNRchosen[i])*(WvlengthCount+1)+1):(int(SNRchosen[i])*(WvlengthCount+1)+1+WvlengthCount)]
+                    plt2.plot(Wvlength,map(float,SNRdisplay))
                 plt2.xlim([400, 2500]) 
                 plt2.ylim([0, 105]) 
                 plt2.title('Sensor Signal-to-Noise Ratio')
                 plt2.xlabel('Wavelength(microns)')
                 plt2.ylabel('Signal-to-Noise Ratio')
-                plt2.legend(LegendS,prop={'size':8})
+                plt2.legend(LegendSNR,prop={'size':8})
                 plt2.savefig("C:/Django/pysite/media/"+session_key+"/snr.png",dpi=100)
                 plt2.clf()
-#            im = Image.open("C:/Django/pysite/media/output.png")
-#            out = im.resize((800,600))
-#            out.save('C:/Django/pysite/media/output.png')
-        
+      
             return render_to_response('result.html',{'session_key':session_key,'FormRadianceChoice':FormRadianceChoice(),'FormSNRChoice':FormSNRChoice(),'SensorName':str(SensorName),'FormSensorName':formsensorname})       
     else:
         formradiancechoice = FormRadianceChoice(request.POST)
         formSNRchoice = FormSNRChoice(request.POST)
         session_key = request.session.get('session_key',False)    
-#        FormRadianceChoice=FormRadianceChoice()
-#        FormSNRChoice=FormSNRChoice()
+
         return render_to_response('result.html',{'session_key':session_key,'FormRadianceChoice':FormRadianceChoice(),'FormSNRChoice':FormSNRChoice()})
+        
 def final(request, offset):
     if os.path.exists('C:/Django/pysite/media/'+offset+'/')==False:
         raise Http404()   
@@ -459,40 +395,7 @@ def final(request, offset):
     else:
         session_key = request.session.get('session_key',False) 
         return render_to_response('cbresult.html',{'session_key':session_key})
-                
-def erf(x):
-    # save the sign of x
-    sign = 1 if x >= 0 else -1
-    x = abs(x)
 
-    # constants
-    a1 =  0.254829592
-    a2 = -0.284496736
-    a3 =  1.421413741
-    a4 = -1.453152027
-    a5 =  1.061405429
-    p  =  0.3275911
-
-    # A&S formula 7.1.26
-    t = 1.0/(1.0 + p*x)
-    y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*math.exp(-x*x)
-    return sign*y # erf(-x) = -erf(x) 
-def readtitledfile(filename):
-    str1 = 'C:\Django\pysite\\'
-    str2 = filename;
-    str3 = '.txt'
-    txt = open(str1+str2+str3,'r')
-    txtall = txt.readlines()
-    packsize=1
-    while txtall[packsize][0].isdigit() and packsize<len(txtall)-1:
-        packsize=packsize+1
-    if packsize ==len(txtall) - 1:
-        packsize = packsize + 2
-    Output=[];
-    packsize = packsize -2;
-    for i in range(0,len(txtall)/(packsize+1)):
-        Output = Output + map(float,txtall[(i*(packsize+1)+1):((i+1)*(packsize+1)+1)])    
-    return Output
 def parsesensor(filename,path):
 #    path = 'C:/FASSP_EMMETT/v2.4/sens/'
 #    filename = 'HyMap.sen'
@@ -510,12 +413,7 @@ def parsesensor(filename,path):
     f = open('C:/Django/pysite/wavelength.txt', 'wb')
     f.write(outs.join(out)) 
     f.close()
-def findsensorname(filename,path): 
-    fcm = open(path + filename,'r')
-    txt = open
-    for i in range(0,50):
-        line = fcm.readline()
-    return line.split()[1]
+
 def parseFCM_genPrefill(filename,path):
 #    path = 'C:/FASSP_EMMETT/v2.4/pfiles/'
 #    filename = 'customized.fcm'
@@ -647,31 +545,17 @@ def parseFCM_genPrefill(filename,path):
     data = data+"\r\n"+"Integration Time"+"::"+temp
     dict['Integration Time'] = temp
 
- #   f = open('C:/Django/pysite/media/'+sessionID+'/prefill.txt', 'wb')
-#    f.write(data)
- #   f.close()
-    f = open('C:/Django/pysite/prefill.txt', 'wb')
-    f.write(data)
-    f.close()
     return dict
     
-def readfile(filename):
-    str1 = 'C:\Django\pysite\\'
-    str2 = filename;
-    str3 = '.txt'
-    txt = open(str1+str2+str3,'r')
-    txtall = txt.readlines()
-    Output =map(float,txtall)    
-    return Output
-
-def readfilep(filename,path):
+def readfilep(filename,path='C:/Django/pysite/'):
     str2 = filename;
     str3 = '.txt'
     txt = open(path+str2+str3,'r')
     txtall = txt.readlines()
     Output =map(float,txtall)    
     return Output
-def readfilep2(filename,path):
+    
+def readfilepstr(filename,path):
     str2 = filename;
     str3 = '.txt'
     txt = open(path+str2+str3,'r')
@@ -684,18 +568,4 @@ def modifyCustomFCM(keyword, value, data, multi = 0):
         data = re.sub(keyword + r'.*' +';', keyword + '\t' + value +'\t'+';',data)
     else:
         data = re.sub(keyword + r'.*' +';', keyword + '\t/' + value +'/\t'+';',data)
-    return data    
-    
-    
-def index(request):  
-    return HttpResponse('Hello, Django!!!!')  
-    
-def helloworld(request):
-    SMR = request.GET.get('SMR','0')
-    SRSD = request.GET.get('SRSD','0')
-    SMT = request.GET.get('SMT','0')
-
-    fresult = int(SMR)+int(SRSD)+int(SMT)
-    return render_to_response("helloworld.html", {"fresult": fresult})
-#    return HttpResponseRedirect(reverse('pysite.helloworld.helloworld.results',args=(fresult,)))
-    
+    return data
