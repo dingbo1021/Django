@@ -1,23 +1,23 @@
 Target Name::vgrnbmw.ref
 Target Scale::1.00
-Target Percentage::25
-In Bkg No::3
-Bkg Name::950824_05_Tree1_R.ref,950824_05_Grass1_R.ref,urban_road.ref
+Target Percentage::5
+In Bkg No::1
+Bkg Name::950824_05_Grass1_R.ref
 Bkg Scale::1.00
-Bkg Percentage::50, 40, 10
-Bkg Class Count::3
-Meteorological Range::10
-Solar Angle::60
-Ground Altitude::0
-Atmospheric Model::2
-Atmospheric Haze::2
+Bkg Percentage::100
+Bkg Class Count::1
+Meteorological Range::30
+Solar Angle::40.0
+Ground Altitude::0.00
+Atmospheric Model::3
+Atmospheric Haze::1
 Cloud Index::0
-Sensor Name::HyMap.sen
-View Angle::0
+Sensor Name::hyperion.sen
+View Angle::7.5
 Noise Factor::1.0
 Gain Factor::1.0
-Rltv Calibration Error::1.0
+Rltv Calibration Error::0.0
 Sensor Bits::12
 Sensor BER::1.00e-9
-Sensor Altitude::1.0
-Integration Time::0.0001
+Sensor Altitude::705.0
+Integration Time::0.004

@@ -7,9 +7,12 @@
 <h3>The result1 is {{fresult1}}, {{fresult2}}, {{fresult3}}, {{fresult4}}, {{fresult5}},{{fresult6}}</h3>
 
 <h3>The result2 is {{result1}}, {{result2}}, {{result3}}, {{result4}}, {{result5}},{{result6}}</h3>
+<h3>Sensor: {{SensorName}}</h3>
+
 <h3>check back url = http://localhost/mysite/result/{{session_key}}</h3>
 <h3>Scene Mean Spectral Radiance</h3>
 <form action="/mysite/result/" method="POST"> 
+<p>{{FormSensorName.as_p}}</p>
 <table>
 	<tr>
 	

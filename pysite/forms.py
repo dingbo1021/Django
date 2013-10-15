@@ -138,7 +138,12 @@ class MessageForm(forms.Form):
 
 class FormBkgName(forms.Form): 
     hiddentxt = forms.CharField(widget=forms.HiddenInput, required=False)
-    
+class FormSensorName(forms.Form): 
+    def __init__(self, *args, **kw):
+        SensorName = kw.pop("SensorName")
+        super(forms.Form, self).__init__(*args, **kw)	
+        self.fields["Sensorname"] = forms.CharField(initial = SensorName, required=False,widget=forms.HiddenInput)
+        
 class FormScene(forms.Form): 
     def __init__(self, *args, **kw):
     
