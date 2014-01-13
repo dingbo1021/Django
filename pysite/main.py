@@ -320,8 +320,12 @@ def paraselection(request):
             open(path+'SNR.txt', 'wb').write(''.join(dataSNR))
 
             formsensorname = FormSensorName(SensorName = SensorName)
+            
+            selections = get_choiceswithAVGandTarget(str(TargName),str(Bkgname))
+            formradiancechoice = FormRadianceChoice(init = selections, tgtname = str(TargName),bkgname = str(Bkgname))
+            formsnrchoice = FormSNRChoice(init = selections, tgtname = str(TargName),bkgname = str(Bkgname))
 
-            return render_to_response('result.html',{'FormRadianceChoice':FormRadianceChoice(),'FormSNRChoice':FormSNRChoice(),
+            return render_to_response('result.html',{'FormRadianceChoice':formradiancechoice,'FormSNRChoice':formsnrchoice,
                 'fresult3':Pdmin[2],'fresult4':Pdmin[3],'fresult5':Pdmin[4],'fresult6':Pdmin[5],'result1':Pfa[0],'result2':Pfa[1],
                 'result3':Pfa[2],'result4':Pfa[3],'result5':Pfa[4],'result6':Pfa[5],'session_key':session_key,'SensorName':str(SensorName),'FormSensorName':formsensorname})            
         else:
@@ -332,23 +336,31 @@ def paraselection(request):
 
 def results(request):
     if request.method == 'POST': 
-        formradiancechoice = FormRadianceChoice(request.POST)
-        formSNRchoice = FormSNRChoice(request.POST)
+
+        tgtname = request.POST['tgtname']
+        bkgname = request.POST['bkgname']
+        selections = get_choiceswithAVGandTarget(tgtname,bkgname)
+ #       raise Exception(selections)
+        formradiancechoice = FormRadianceChoice(request.POST,init = selections, tgtname = tgtname,bkgname = bkgname)
+
+ #       raise Exception(formradiancechoice.f.is_bound)         
+        formSNRchoice = FormSNRChoice(request.POST,init = selections, tgtname = tgtname,bkgname = bkgname)
         session_key = request.session.get('session_key',False)
         SensorName = request.POST['Sensorname']
         formsensorname = FormSensorName(SensorName = SensorName)
-        if formradiancechoice.is_valid() and formSNRchoice.is_valid():
+        
+        Wvlength = readfilep(str(SensorName),'C:/FASSP_EMMETT/v2.4/sensorWV/')
+        WvlengthCount = len(Wvlength)
+        path = 'C:/Django/pysite/media/'+session_key+'/'
+        Ltnumbers = readfilepstr('LBT',path)
+        SNRn = readfilepstr('SNR',path)
+        ROC = readfilep('ROC')
+       
+#        raise Exception(formradiancechoice)
+        
+        if formradiancechoice.is_valid():
             Radchosen = formradiancechoice.cleaned_data['BkgnameR'] 
-            SNRchosen = formSNRchoice.cleaned_data['BkgnameS'] 
-            Wvlength = readfilep(str(SensorName),'C:/FASSP_EMMETT/v2.4/sensorWV/')
-            
-            WvlengthCount = len(Wvlength)
-            path = 'C:/Django/pysite/media/'+session_key+'/'
-            Ltnumbers = readfilepstr('LBT',path)
-            SNRn = readfilepstr('SNR',path)
-            ROC = readfilep('ROC')
-            
-            choicesR = formradiancechoice.fields['BkgnameR'].choices        
+            choicesR = formradiancechoice.fields['BkgnameR'].choices 
             LegendRadiance=[]
             if len(Radchosen)!=0:
                 for i in range(0, len(Radchosen)):
@@ -363,12 +375,14 @@ def results(request):
                 plt1.legend(LegendRadiance,prop={'size':8})
                 plt1.savefig("C:/Django/pysite/media/"+session_key+"/rad.png",dpi=100)
                 plt1.clf()
-                    
+
+        if formSNRchoice.is_valid():    
+            SNRchosen = formSNRchoice.cleaned_data['BkgnameS'] 
             choicesS = formSNRchoice.fields['BkgnameS'].choices
             LegendSNR=[]  
             if len(SNRchosen)!=0:
                 for i in range(0, len(SNRchosen)):
-                    LegendSNR.append(choicesR[int(SNRchosen[i])][1])
+                    LegendSNR.append(choicesS[int(SNRchosen[i])][1])
                     SNRdisplay = SNRn[(int(SNRchosen[i])*(WvlengthCount+1)+1):(int(SNRchosen[i])*(WvlengthCount+1)+1+WvlengthCount)]
                     plt2.plot(Wvlength,map(float,SNRdisplay))
                 plt2.xlim([400, 2500]) 
@@ -380,7 +394,8 @@ def results(request):
                 plt2.savefig("C:/Django/pysite/media/"+session_key+"/snr.png",dpi=100)
                 plt2.clf()
       
-            return render_to_response('result.html',{'session_key':session_key,'FormRadianceChoice':FormRadianceChoice(),'FormSNRChoice':FormSNRChoice(),'SensorName':str(SensorName),'FormSensorName':formsensorname})       
+        return render_to_response('result.html',{'session_key':session_key,'FormRadianceChoice':FormRadianceChoice(init = selections, tgtname = tgtname,bkgname = bkgname),
+        'FormSNRChoice':FormSNRChoice(init = selections, tgtname = tgtname,bkgname = bkgname),'SensorName':str(SensorName),'FormSensorName':formsensorname})    
     else:
         formradiancechoice = FormRadianceChoice(request.POST)
         formSNRchoice = FormSNRChoice(request.POST)
@@ -569,3 +584,19 @@ def modifyCustomFCM(keyword, value, data, multi = 0):
     else:
         data = re.sub(keyword + r'.*' +';', keyword + '\t/' + value +'/\t'+';',data)
     return data
+    
+    
+    
+def get_choiceswithAVGandTarget(targetname, backgroundname):
+    stringA = 'Avg Background'
+    stringT = targetname
+    string = backgroundname
+            
+    choices_list = string.strip().split(',')
+    out = []
+    for x in range(len(choices_list)):
+        if choices_list[x]!='':
+            out.append([x,choices_list[x]]) 
+    out.append([x+1,stringA])        
+    out.append([x+2,stringT])
+    return tuple(out)

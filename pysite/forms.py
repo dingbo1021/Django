@@ -17,6 +17,8 @@ SENSOR_CHOICES = (
 TARGET_CHOICES = (
     ('vgrnbmw.ref','Green BMW'),
     ('grnwood.ref','Green Wood'),
+    ('grnwood_ASD.ref','Green Wood ASD'),
+    ('yelwood_ASD.ref','Yellow Wood ASD'),
     ('whitetarp.ref','White Tarp'),
     ('blacktarp.ref','Black Tarp'),
     ('avongrass.ref','Avon Grass'),
@@ -27,6 +29,7 @@ BKG_CHOICES = (
     ('950824_05_Tree1_R.ref','TREE'),
     ('950824_05_Grass1_R.ref','Old GRASS'),
     ('urban_road.ref','ROAD'),
+    ('grnwood_ASD.ref','Green Wood ASD'),
     ('avongrass.ref','Avon Grass'),
     ('whitetarp.ref','White Tarp'),    
     ('blacktarp.ref','Black Tarp'), 
@@ -222,12 +225,33 @@ class FormWavelength_to_choose(forms.Form):
 
 class FormRadianceChoice(forms.Form): 
     def __init__(self, *args, **kw):
+        init = kw.pop("init")
+        tgtname = kw.pop("tgtname")
+        bkgname = kw.pop("bkgname")
         super(forms.Form, self).__init__(*args, **kw)
-        self.fields["BkgnameR"] = forms.MultipleChoiceField(label='Choose to plot',choices=get_choiceswithAVGandTarget('Bkg Name'),widget=forms.CheckboxSelectMultiple,required=False)
+        self.fields["BkgnameR"] = forms.MultipleChoiceField(label='Choose to plot',choices=init,widget=forms.CheckboxSelectMultiple,required=True)
+        self.fields["tgtname"] = forms.CharField(initial = tgtname, required=True, widget=forms.HiddenInput)
+        self.fields["bkgname"] = forms.CharField(initial = bkgname, required=True, widget=forms.HiddenInput)
 class FormSNRChoice(forms.Form): 
     def __init__(self, *args, **kw):
+        init = kw.pop("init")
+        tgtname = kw.pop("tgtname")
+        bkgname = kw.pop("bkgname")
         super(forms.Form, self).__init__(*args, **kw)
-        self.fields["BkgnameS"] = forms.MultipleChoiceField(label='Choose to plot',choices=get_choiceswithAVGandTarget('Bkg Name'),widget=forms.CheckboxSelectMultiple,required=False)
+        self.fields["BkgnameS"] = forms.MultipleChoiceField(label='Choose to plot',choices=init,widget=forms.CheckboxSelectMultiple,required=True)
+        self.fields["tgtname"] = forms.CharField(initial = tgtname, required=True, widget=forms.HiddenInput)
+        self.fields["bkgname"] = forms.CharField(initial = bkgname, required=True, widget=forms.HiddenInput)
+
+class FormRadianceChoiceResult(forms.Form): 
+    def __init__(self, *args, **kw):
+        init = kw.pop("init")
+        super(forms.Form, self).__init__(*args, **kw)
+        self.fields["BkgnameR"] = forms.MultipleChoiceField(label='Choose to plot',choices=init,widget=forms.CheckboxSelectMultiple,required=False)
+class FormSNRChoiceResult(forms.Form): 
+    def __init__(self, *args, **kw):
+        init = kw.pop("init")
+        super(forms.Form, self).__init__(*args, **kw)
+        self.fields["BkgnameS"] = forms.MultipleChoiceField(label='Choose to plot',choices=init,widget=forms.CheckboxSelectMultiple,required=False)
 
 
 class FormCustomize(forms.Form): 
