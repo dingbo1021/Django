@@ -161,17 +161,17 @@ def paraselection(request):
 #        raise Exception(request.POST)
         form = FormWVchosen(request.POST) # this form is to store the chosen wavelength, and sessionID
 #        formfinal = FormFinalSubmition(request.POST)     
-        
+#        raise Exception(form)
         if(form.is_valid()):
             #use a hidden txt block to transfer WV chosen.
             hiddentxt  = form.cleaned_data['hiddentxt']             
             #store all chosen wavelength
             #write it to wchosen.txt, but could be combined with fcm file.
-            f = open("C:/Django/pysite/wchosen.txt", "w")
-            for x in range(0,len(hiddentxt)):
-                f.write("%s" % (hiddentxt[x]))
-            f.close()
-            
+#            f = open("C:/Django/pysite/wchosen.txt", "w")
+#            for x in range(0,len(hiddentxt)):
+#                f.write("%s" % (hiddentxt[x]))
+#            f.close()
+#            raise Exception(hiddentxt)
 
             Atmospheric_haze = request.POST['Atmospheric_haze']
             Solangle = request.POST['Solangle'] 
@@ -199,16 +199,22 @@ def paraselection(request):
             
             while not Backperc[-1].isdigit():
                 Backperc = Backperc[:-1]
-           
+                
+ ###########to avoid repeat submitting
+ #           if request.session['session_key'] [-1] == 'a':
+  #              request.session['session_key']=request.session['session_key'][:-1]
+  #              return render_to_response('noresubmit.html')  
+                
  ###########generate random number for diff users
             session_key = str(random.random())[2:]
             request.session['session_key'] = session_key
+            
             path = 'C:/Django/pysite/media/'+session_key+'/'
             if os.path.exists(path)==False:
                 os.mkdir(path);  
-                
+
             #modify custimized fcm file
-            FCMdata = open('C:/FASSP_EMMETT/v2.4/pfiles/template.fcm').read()
+            FCMdata = open('C:/FASSP_EMMETT/v2.4/pfiles/customized_base.fcm').read()
             
             FCMdata = modifyCustomFCM('ihaze', str(Atmospheric_haze), FCMdata)
             FCMdata = modifyCustomFCM('solangle', str(Solangle), FCMdata)
@@ -233,11 +239,12 @@ def paraselection(request):
             FCMdata = modifyCustomFCM('backname', str(Bkgname), FCMdata,1)
             FCMdata = modifyCustomFCM('backperc', Backperc, FCMdata,1)
             FCMdata = modifyCustomFCM('numback', str(len(Backperc.split(','))), FCMdata)
-            
-##########writing chosen wvlg to FCM file for C++ code
-            FCMdata = modifyCustomFCM('wavelengthchosen', ','.join(str(hiddentxt).split('\r\n'))[:-1], FCMdata)
-            open('C:/FASSP_EMMETT/v2.4/pfiles/customized.fcm', 'wb').write(FCMdata)
 
+##########writing chosen wvlg to FCM file for C++ code
+            FCMdata = modifyCustomFCM('wavelengthchosen', ','.join(str(hiddentxt).split('\r\n'))[:-1], FCMdata,1)
+#            hiddentxt=' '
+            open('C:/FASSP_EMMETT/v2.4/pfiles/customized.fcm', 'wb').write(FCMdata)
+#            raise Exception(hiddentxt)
 ############################################################################################################
             feedback = os.system("C:/Django/pysite/working.exe")
             #to be finished: give fcm file to queue, then check sessionid folder. 
@@ -318,13 +325,13 @@ def paraselection(request):
             open(path+'ROC.txt', 'wb').write(''.join(dataROC))
             open(path+'LBT.txt', 'wb').write(''.join(dataL))
             open(path+'SNR.txt', 'wb').write(''.join(dataSNR))
-
+            
             formsensorname = FormSensorName(SensorName = SensorName)
             
             selections = get_choiceswithAVGandTarget(str(TargName),str(Bkgname))
             formradiancechoice = FormRadianceChoice(init = selections, tgtname = str(TargName),bkgname = str(Bkgname))
             formsnrchoice = FormSNRChoice(init = selections, tgtname = str(TargName),bkgname = str(Bkgname))
-
+            
             return render_to_response('result.html',{'FormRadianceChoice':formradiancechoice,'FormSNRChoice':formsnrchoice,
                 'fresult3':Pdmin[2],'fresult4':Pdmin[3],'fresult5':Pdmin[4],'fresult6':Pdmin[5],'result1':Pfa[0],'result2':Pfa[1],
                 'result3':Pfa[2],'result4':Pfa[3],'result5':Pfa[4],'result6':Pfa[5],'session_key':session_key,'SensorName':str(SensorName),'FormSensorName':formsensorname})            

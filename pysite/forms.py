@@ -29,7 +29,7 @@ BKG_CHOICES = (
     ('950824_05_Tree1_R.ref','TREE'),
     ('950824_05_Grass1_R.ref','Old GRASS'),
     ('urban_road.ref','ROAD'),
-    ('grnwood_ASD.ref','Green Wood ASD'),
+    ('asphalt_ASD.ref','Avon Asphalt'),
     ('avongrass.ref','Avon Grass'),
     ('whitetarp.ref','White Tarp'),    
     ('blacktarp.ref','Black Tarp'), 
